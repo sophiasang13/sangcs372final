@@ -58,6 +58,12 @@ The model development followed a systematic, evaluation-driven approach. Each it
 | **2: Augmentation** | Implemented **Mixup** augmentation | **Val AUC: 0.7688** | Significant boost in generalization (+5.2%). Reduced overfitting on short clips. |
 | **3: Loss & Stability** | **Focal Loss** + **Gradient Accumulation** | **Val AUC: 0.6818** | Temporary dip in AUC. Focal Loss targeted rare species, but required more stability (larger effective batch size). |
 | **4: Data Quality** | **Targeted Resampling** of Soundscapes | **Val AUC: 0.7988** | **Best Performance.** Realized soundscapes were "sparse" (low bird density). Filtering for active segments improved signal-to-noise ratio. |
+* Initial Model Loss and Val AUC *
+![Initial Model Performance](Finalproject/initialloss.png)
+* Final Model Loss and Val AUC *
+![Final Model Performance](Finalproject/finalloss.png)
+
+Towards the end, the model was able to improve until about 0.8 AUC but it was unable to get past that threshold likely due to data issues which wil be discussed later
 
 ---
 
@@ -85,25 +91,22 @@ To claim the 7-point rubric item for Error Analysis, this section discusses the 
 ![AUC Distribution Per Species](Finalproject/error_analysis_fig1_auc_distribution.png)
 *Figure 1: ROC-AUC Distribution across 234 species.*
 
-**Analysis:** The distribution shows a strong "head" of high-performing species (AUC > 0.85) but a long "tail" of struggling classes. While the model excels at identifying common species with distinct melodic signatures, the density of species in the 0.50–0.65 range indicates significant difficulty in the multi-label classification task when bird calls overlap.
+
+**Analysis:**Of the 234 total species in the taxonomy, only 40 (17.1%) could be evaluated at all — the remaining 194 species had zero positive examples in the validation set due to extreme class imbalance in the soundscape labels. Among the 40 evaluable species, performance was generally strong: 26 achieved AUC > 0.8, 13 fell in the mediocre 0.5–0.8 range, and only 1 species (Rufous-tailed Jacamar, AUC = 0.184) performed worse than random chance. The mean AUC across evaluable species was 0.805 and the median was 0.834, indicating the model is genuinely discriminative for species it has seen — the primary failure mode is not poor discrimination but rather insufficient coverage. The AUC histogram is left-skewed, with most mass concentrated above 0.75, confirming that when the model encounters a species it has been exposed to, it tends to rank it correctly.
 
 ### **2. The Sparsity Gap (Fig 2)**
 ![Sparsity vs Performance](Finalproject/error_analysis_fig2_sparsity.png)
 *Figure 2: Correlation between training sample volume and per-class AUC.*
 
-**Analysis:** There is a clear positive correlation between the number of training samples and species-level performance. 
-- **The "Data Desert":** Species with fewer than 10 training segments (e.g., rare Pantanal endemics) consistently fall below the 0.60 AUC threshold. 
-- **Justification for Methodology:** This finding justified the implementation of the `WeightedRandomSampler` and the use of **Focal Loss**, which forces the model to attend more heavily to these underrepresented, high-difficulty samples.
+**Analysis:** Surprisingly, the Pearson correlation between training sample count and per-class AUC was only r = −0.07, essentially zero. This initially seems to contradict the expectation that more data yields better performance. However, the scatter plot reveals why: several of the best-performing species (Orange-winged Amazon, Dwarf Tree Frog, Tropical Screech Owl, White-tipped Dove) had zero training clips in the bird-audio set yet still achieved AUC > 0.96. This suggests the CNN14 backbone — pretrained on AudioSet — already learned transferable acoustic representations for these species, making additional fine-tuning data less critical. The true bottleneck is not sample count per se but whether the species' call type overlaps with AudioSet's prior knowledge. The single clear outlier below AUC 0.5 is the Rufous-tailed Jacamar, which also had zero training examples and whose call pattern appears acoustically distinct from anything the backbone had previously encountered.
+
 
 ### **3. Failure Case Taxonomy (Fig 3)**
 ![Failure Case Examples](Finalproject/error_analysis_fig3_failure_cases.png)
 *Figure 3: Qualitative look at False Positives (FP) and False Negatives (FN).*
 
 **Why the model fails:**
-Through manual inspection of the failure cases in Figure 3, three primary environmental challenges were identified:
-* **Low Signal-to-Noise Ratio (SNR):** In the "False Negative" cases, bird vocalizations are often masked by heavy rain or wind—common in Pantanal field recordings. The CNN14 backbone struggles to distinguish low-amplitude harmonics from broadband environmental noise.
-* **Confusion between Morphologically Similar Calls:** Several species (e.g., specific flycatchers) have calls with nearly identical frequency ranges and temporal patterns. Without more training data, the model lacks the "fine-grained" resolution to distinguish these subtle differences.
-* **Audio "Silence" in Soundscapes:** As identified in Iteration 4, many soundscape segments are effectively "empty." Predicting the most common species (the "Global Average") becomes a failure mode when the model tries to find a signal in near-silent recordings.
+The four worst-performing species shown — Insect sonotype10 (AUC 0.553), Insect sonotype16 (AUC 0.549), Insect sonotype15 (AUC 0.522), and Rufous-tailed Jacamar (AUC 0.184) — share a common failure pattern. In each case the true species probability assigned by the model is very low (ranging from 0.003 to 0.237), while the top-5 predicted species are entirely different. For the three insect sonotypes, the model consistently confuses them with one another (e.g., predicting Insect sonotype25, 11, and 17 when the true label is sonotype15 or 16), indicating that acoustically similar non-bird vocalizations form a cluster the model cannot reliably separate. Their spectrograms show diffuse, broadband energy with faint harmonic sweeps — patterns that are ambiguous even to a human listener without domain expertise. For the Rufous-tailed Jacamar, the spectrogram is nearly featureless (flat background noise), suggesting the labeled segment contains little or no audible vocalization, making correct prediction structurally impossible regardless of model capacity. These failure modes point to two distinct root causes: (1) inter-class acoustic confusion among rare, perceptually similar non-bird sounds, and (2) label noise or silent segments in the soundscape annotations.
 
 ---
 
