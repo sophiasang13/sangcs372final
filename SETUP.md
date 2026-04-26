@@ -18,8 +18,8 @@ Follow these steps in order to reproduce the environment and run the notebook.
 ## 2. Clone the repository
 
 ```bash
-git clone <your-repo-url>
-cd <repo-folder>
+git clone https://github.com/sophiasang13/sangcs372final.git
+cd Finalproject
 ```
 ---
 
