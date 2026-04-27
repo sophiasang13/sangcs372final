@@ -35,6 +35,7 @@ This document lists all external sources, datasets, pretrained models, libraries
 | pandas | ≥ 2.0 | CSV loading and metadata manipulation |
 | matplotlib | ≥ 3.7 | Error analysis visualisations |
 | jupyter | ≥ 1.0 | Notebook environment |
+| gradio| ≥ 4.0 | Webapp Launcher |
 
 ---
 
@@ -51,5 +52,6 @@ This document lists all external sources, datasets, pretrained models, libraries
   - `ATTRIBUTION.md`
   - `dataprocessing4.ipynb`
   - `oggtowav.ipynb`
+  - `inference.ipynb`
 
 - All AI-assisted code was reviewed, tested, and modified to ensure correctness and academic integrity
