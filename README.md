@@ -30,14 +30,18 @@ jupyter notebook oggtowav.ipynb
 ### run training
 
 jupyter notebook dataprocessing4.ipynb
+
+### run inference
+
+jupyter notebook Inference.ipynb
 ---
 
 ## Video Links
 
 | Video | Link |
 |---|---|
-| Demo Walkthrough | *(add link here)* |
-| Technical Walkthrough | *(add link here)* |
+| Demo Walkthrough | https://drive.google.com/file/d/1-8kU_zqA1m7iete04UyR8DEkUU1i1EwO/view?usp=sharing |
+| Technical Walkthrough |https://drive.google.com/file/d/1dyj5uiyU42xmN7SUKWHNQG5E_O7Phytu/view?usp=sharing|
 
 ---
 
