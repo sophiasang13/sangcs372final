@@ -75,10 +75,18 @@ Change input_dir to where your ogg files are hosted and output directory to wher
 
 Run all cells top-to-bottom. Training checkpoints are saved automatically to the project root.
 
-## 8. Launch the main notebook
+## 8. Launch the main notebook 
 
 ```bash
 jupyter notebook dataprocessing4.ipynb
+```
+
+Run all cells top-to-bottom. Training checkpoints are saved automatically to the project root.
+
+## 9. Launch the webapp
+
+```bash
+jupyter notebook Inference.ipynb
 ```
 
 Run all cells top-to-bottom. Training checkpoints are saved automatically to the project root.
