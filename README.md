@@ -83,7 +83,7 @@ To address the challenge of "noisy labels" and "sparsity" in field recordings:
 * **Training Stability:** Implemented **Gradient Accumulation** (4 steps) to simulate a larger batch size, which was necessary to stabilize the gradients when using Focal Loss on a single GPU.
 * **Mixed Precision:** Utilized `torch.cuda.amp` to reduce VRAM footprint on the RTX 2080 Ti, allowing for faster iteration cycles.
 
-#### **3. Transfer Learning & Domain Adaptation (7 pts)**
+#### **3. Transfer Learning & Domain Adaptation **
 * **Task Adaptation:** Successfully adapted a model pretrained on **AudioSet** (general environmental sounds like "Car" or "Speech") to the highly specific domain of **Pantanal Avian Vocalizations**. This involved a two-phase strategy: first freezing the backbone to stabilize the new head, followed by a partial unfreezing of the top convolutional blocks.
 
 
